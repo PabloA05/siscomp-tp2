@@ -1,35 +1,100 @@
-import websocket
+import ctypes
 import json
+import time
+
+import requests
+import websocket
+
+dolar_url = 'https://www.dolarsi.com/api/api.php?type=valoresprincipales'
+euro_url = 'https://api.exchangerate-api.com/v4/latest/EUR'
+ws_url = "wss://ws.finnhub.io?token=cgjlh8pr01qt0jk14jn0cgjlh8pr01qt0jk14jng"
+
+# Cargando la biblioteca compartida
+lib = ctypes.cdll.LoadLibrary('./conversor.so')
+
+# Declarando la función conversor de C
+lib.conversor.restype = ctypes.c_float
+lib.conversor.argtypes = [ctypes.c_float, ctypes.c_float]
+
+# variables globales default para almacenar las cotizaciones de USDTEUR y USDTARS
+USDEUR = 1.09
+USDARS = 400
+
+
+def get_fiat_price(api_url, target_currency):
+    global USDARS, USDEUR
+    response = requests.get(api_url)
+
+    # Si la solicitud fue exitosa (código de estado HTTP 200),
+    # extraemos el valor de la cotización del response
+    if response.status_code == 200:
+        data = response.json()
+        # Obtenemos la tasa de conversión deseada e imprimimos el resultado
+        if target_currency == "ARS":
+            USDARS = [item['casa']['venta']
+                      for item in data if item['casa']['nombre'] == 'Dolar Blue'][0]
+            print(f'Último precio de USD/ARS: {USDARS}')
+        else:
+            USDEUR = data['rates']["USD"]
+            print(f'Último precio de USD/EUR: {USDEUR}')
+
+    else:
+        print(
+            f'Error al obtener la cotización de USD/{target_currency}. '
+            f'Utilizamos un valor referencia de {USDARS if target_currency == "ARS" else USDEUR}'
+        )
+
+
+def send_subscription(ws, symbol):
+    subscription_message = {"type": "subscribe", "symbol": symbol}
+    ws.send(json.dumps(subscription_message))
+
 
 def on_open(ws):
-    print("opened")
-    subscribe_message = {
-        "type": "subscribe",
-        "symbol": "BINANCE:BTCUSDT"
-    }
-    subscribe_message_json = json.dumps(subscribe_message)
-    ws.send(subscribe_message_json)
+    print("Web Socket Opened")
+    send_subscription(ws, "BINANCE:BTCUSDT")
+    send_subscription(ws, "BINANCE:ETHUSDT")
 
-    subscribe_message = {
-        "type": "subscribe",
-        "symbol": "BINANCE:ETHUSDT"
-    }
-    subscribe_message_json = json.dumps(subscribe_message)
-    ws.send(subscribe_message_json)
 
-def on_close(ws):
-    print("closed connection")
+def on_close():
+    print("Web Socket closed connection")
+    # Reconnect after a delay
+    time.sleep(5)
+    main()
 
-def on_message(ws, message):
+
+def on_message(message):
     data = json.loads(message)
     if data["type"] == "trade":
-        if data["data"][0]["s"] == "BINANCE:BTCUSDT":
-            btc_price = data["data"][0]["p"]
-            print(f"BTC: {btc_price}")
-        elif data["data"][0]["s"] == "BINANCE:ETHUSDT":
-            eth_price = data["data"][0]["p"]
-            print(f"ETH: {eth_price}")
+        crypto_price = data["data"][0]["p"]
+        crypto_currency = "BTC" if data["data"][0]["s"] == "BINANCE:BTCUSDT" else "ETH"
 
-socket = "wss://ws.finnhub.io?token=cgjlh8pr01qt0jk14jn0cgjlh8pr01qt0jk14jng"
-ws = websocket.WebSocketApp(socket, on_open=on_open, on_close=on_close, on_message=on_message)
-ws.run_forever()
+        # convertir a pesos argentinos usando la función "conversor"
+        ars_price = lib.conversor(float(crypto_price), float(USDARS))
+        eur_price = lib.conversor(float(crypto_price), float(USDEUR))
+        print(f"{crypto_currency}: USD: {crypto_price}, ARS: {ars_price}, EUR: {eur_price}")
+
+
+def main():
+    get_fiat_price(dolar_url, "ARS")
+    get_fiat_price(euro_url, "EUR")
+
+    # Obtenemos las cotizaciones USDTEUR y USDTARS
+    ws = websocket.WebSocketApp(
+        ws_url, on_open=on_open, on_close=on_close, on_message=on_message
+    )
+    ws.run_forever()
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("^C\nExiting the application.")
+    except EOFError:
+        print("^D\nExiting the application.")
+    except Exception as e:
+        print(f"Error: {e}")
+        # Reconnect after a delay
+        time.sleep(5)
+        main()
