@@ -31,7 +31,7 @@ void _printBannerError (int opt){
 
 float conversor(float number1, float number2) {
 
-    printf ("--> Entrando a convesor ubicado en .c\n");
+    printf ("\n--> Entrando a convesor con %f y %f\n", number1, number2);
     
     if (number1 < 0.0 || number2 < 0.0)
     {
@@ -41,7 +41,7 @@ float conversor(float number1, float number2) {
      
     printf ("--> call multiply.asm\n");
     //float ret = multiply(number1 number2); 
-    printf ("--> Valor recibido de multiply.asm : %f \n", 12.5);
+    printf ("--> Valor recibido de multiply.asm : %f \n\n", 12.5);
 
     return 10.4;
 }

@@ -17,7 +17,7 @@ libconversor.conversor.restype = ctypes.c_float
 libconversor.conversor.argtypes = (ctypes.c_float, ctypes.c_float,)
 
 # variables globales default para almacenar las cotizaciones de USDTEUR y USDTARS
-USDEUR = 1.09
+USDEUR = 1.08
 USDARS = 400.0
 
 
@@ -32,7 +32,7 @@ def get_fiat_price(api_url, target_currency):
         # Obtenemos la tasa de conversión deseada e imprimimos el resultado
         if target_currency == "ARS":
             USDARS = [item['casa']['venta']
-                      for item in data if item['casa']['nombre'] == 'Dolar Blue'][0]
+                      for item in data if item['casa']['nombre'] == 'Dolar Blue'][0][0:3]
             print(f'Último precio de USD/ARS: {USDARS}')
         else:
             USDEUR = data['rates']["USD"]
@@ -70,9 +70,7 @@ def on_message(ws, message):
 
         # convertir a pesos argentinos usando la función "conversor"
         ars_price = libconversor.conversor(float(crypto_price), float(USDARS))
-        print(ars_price)
         eur_price = libconversor.conversor(float(crypto_price), float(USDEUR))
-        print(eur_price)
         print(f"{crypto_currency}: USD: {crypto_price}, ARS: {ars_price}, EUR: {eur_price}")
 
 
