@@ -10,11 +10,11 @@ euro_url = 'https://api.exchangerate-api.com/v4/latest/EUR'
 ws_url = "wss://ws.finnhub.io?token=cgjlh8pr01qt0jk14jn0cgjlh8pr01qt0jk14jng"
 
 # Cargando la biblioteca compartida
-lib = ctypes.cdll.LoadLibrary('./conversor.so')
+lib = ctypes.CDLL('./conversor.so')
 
 # Declarando la función conversor de C
 lib.conversor.restype = ctypes.c_float
-lib.conversor.argtypes = [ctypes.c_float, ctypes.c_float]
+lib.conversor.argtypes = (ctypes.c_float, ctypes.c_float,)
 
 # variables globales default para almacenar las cotizaciones de USDTEUR y USDTARS
 USDEUR = 1.09
@@ -55,15 +55,14 @@ def on_open(ws):
     send_subscription(ws, "BINANCE:BTCUSDT")
     send_subscription(ws, "BINANCE:ETHUSDT")
 
-
-def on_close():
+def on_close(ws):
     print("Web Socket closed connection")
     # Reconnect after a delay
     time.sleep(5)
     main()
 
 
-def on_message(message):
+def on_message(ws, message):
     data = json.loads(message)
     if data["type"] == "trade":
         crypto_price = data["data"][0]["p"]
@@ -71,7 +70,9 @@ def on_message(message):
 
         # convertir a pesos argentinos usando la función "conversor"
         ars_price = lib.conversor(float(crypto_price), float(USDARS))
+        print(ars_price)
         eur_price = lib.conversor(float(crypto_price), float(USDEUR))
+        print(eur_price)
         print(f"{crypto_currency}: USD: {crypto_price}, ARS: {ars_price}, EUR: {eur_price}")
 
 
