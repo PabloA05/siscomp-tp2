@@ -1,5 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "cdecl.h"
+
+double PRE_CDECL multiply( double, double ) POST_CDECL;
 
 #define ARGCANT 0
 #define ARGTYPE 1
@@ -39,9 +42,9 @@ float conversor(float number1, float number2) {
         return RETERRO;
     }
      
-    printf ("--> call <file>.asm\n");
-    int ret = asm_main(); 
-    printf ("--> Valor recibido de <file>.asm : %d \n", ret);
+    printf ("--> call multiply.asm\n");
+    float ret = multiply(number1 number2); 
+    printf ("--> Valor recibido de multiply.asm : %f \n", ret);
 
     return 10.4;
 }
