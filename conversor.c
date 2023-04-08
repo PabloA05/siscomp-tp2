@@ -6,6 +6,8 @@
 #define ARGINVA 2
 #define RETERRO -1
 
+int asm_main() __attribute__ ((cdecl));
+
 void _printbanner (float num1){
     printf ("###############################################\n");
     printf ("----> Estamos en el wrapper conversor (C) <----\n");
@@ -31,17 +33,15 @@ float conversor(float number1, float number2) {
 
     printf ("--> Entrando a convesor ubicado en .c\n");
     
-    // se comprueba los valores recibidos
     if (number1 < 0.0 || number2 < 0.0)
     {
         _printBannerError (ARGINVA);
         return RETERRO;
     }
-    
-    // se llama al codigo asm    
+     
     printf ("--> call <file>.asm\n");
-    float ret = 10.4; // = <file>.asm
-    printf ("--> Valor recibido de <file>.asm : %f \n", ret);
+    int ret = asm_main(); 
+    printf ("--> Valor recibido de <file>.asm : %d \n", ret);
 
-    return ret;
+    return 10.4;
 }
