@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "cdecl.h"
 
-//double PRE_CDECL multiply( double, double ) POST_CDECL;
+float PRE_CDECL multiply( float, float ) POST_CDECL;
 
 #define ARGCANT 0
 #define ARGTYPE 1
@@ -31,7 +32,7 @@ void _printBannerError (int opt){
 
 float conversor(float number1, float number2) {
 
-    printf ("\n--> Entrando a convesor con %f y %f\n", number1, number2);
+    printf ("\n--> Entrando a convesor con %.2f y %.2f\n", number1, number2);
     
     if (number1 < 0.0 || number2 < 0.0)
     {
@@ -40,8 +41,17 @@ float conversor(float number1, float number2) {
     }
      
     printf ("--> call multiply.asm\n");
-    //float ret = multiply(number1 number2); 
-    printf ("--> Valor recibido de multiply.asm : %f \n\n", 12.5);
+    float ret = multiply(number1, number2); 
+    printf ("--> Valor recibido de multiply.asm : %.2f \n\n", ret);
 
-    return 10.4;
+    return ret;
+}
+
+int main()
+{
+  float d1 = 12.4;
+  float d2 = 2.5;
+  
+  multiply(d1,d2);
+  return 0;
 }
