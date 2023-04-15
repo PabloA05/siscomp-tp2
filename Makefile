@@ -1,10 +1,10 @@
 AS		:= nasm
-ASFLAGS := -f elf
-CFLAGS	:= -m32
-LDFLAGS := -m32
+ASFLAGS := -f elf64 
+CFLAGS	:= -m64
+LDFLAGS := -m64
 CC		:= gcc
 CXX		:= g++
-CXXFLAGS := -m32
+CXXFLAGS := -m64
 TARGETS := multiply 
 DEP := driver.o asm_io.o
 
@@ -20,5 +20,6 @@ multiply: multiply.o main.c
 
 clean :
 	rm -f *.o $(TARGETS)
-#nasm -f elf multiply.asm
-#gcc -m32  multiply.c multiply.o   -o multiply 
+#  5561  nasm -f elf64 -o multiply.o multiply.asm
+#  5562  gcc -c -m64 -Wall -Wextra -pedantic -std=c11 -o main.o main.c
+#  5563  gcc -m64 -o mult main.o multiply.o
