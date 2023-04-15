@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "cdecl.h"
+//#include "cdecl.h"
 
-float PRE_CDECL multiply( float, float ) POST_CDECL;
+extern float  multiply( float, float ) ;
 
 int main()
 {

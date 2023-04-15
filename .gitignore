@@ -1,6 +1,15 @@
 # Created by https://www.toptal.com/developers/gitignore/api/c++,c,visualstudiocode,python,assembler
 # Edit at https://www.toptal.com/developers/gitignore?templates=c++,c,visualstudiocode,python,assembler
 
+# Ignore all
+*
+# Unignore all with extensions
+!*.*
+# Unignore all dirs
+!*/
+
+*.o
+
 ### Assembler ###
 *.exe
 *.o
@@ -266,7 +275,8 @@ pyrightconfig.json
 # Ignore all local history of files
 .history
 .ionide
-*.o
 multiply
 
 .vscode/
+
+
