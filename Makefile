@@ -1,10 +1,10 @@
 AS		:= nasm
-ASFLAGS := -f elf
-CFLAGS	:= -m32
-LDFLAGS := -m32
+ASFLAGS := -f elf64 
+CFLAGS	:= -m64
+LDFLAGS := -m64
 CC		:= gcc
 CXX		:= g++
-CXXFLAGS := -m32
+CXXFLAGS := -m64
 TARGETS := conversor 
 DEP := driver.o asm_io.o
 
@@ -19,5 +19,6 @@ conversor: multiply.o conversor.c
 
 clean :
 	rm -f *.o $(TARGETS)
-#nasm -f elf multiply.asm
-#gcc -m32  multiply.c multiply.o   -o multiply 
+#    nasm -f elf64 -o multiply.o multiply.asm
+#    gcc -c -m64 -Wall -Wextra -pedantic -std=c11 -o main.o main.c
+#    gcc -m64 -o mult main.o multiply.o
