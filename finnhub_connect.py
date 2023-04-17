@@ -9,6 +9,8 @@ dolar_url = 'https://www.dolarsi.com/api/api.php?type=valoresprincipales'
 euro_url = 'https://api.exchangerate-api.com/v4/latest/EUR'
 ws_url = "wss://ws.finnhub.io?token=cgjlh8pr01qt0jk14jn0cgjlh8pr01qt0jk14jng"
 
+separador = '-' * 50
+
 # Cargando la biblioteca compartida
 libconversor = ctypes.CDLL('./libconversor.so')
 
@@ -35,7 +37,7 @@ def get_fiat_price(api_url, target_currency):
                       for item in data if item['casa']['nombre'] == 'Dolar Blue'][0][0:3]
             print(f'Último precio de USD/ARS: {USDARS}')
         else:
-            USDEUR = data['rates']["USD"]
+            USDEUR = round(1/data['rates']["USD"], 2)
             print(f'Último precio de USD/EUR: {USDEUR}')
 
     else:
@@ -63,15 +65,20 @@ def on_close(ws):
 
 
 def on_message(ws, message):
+    print(separador)
+    print("Empezando las conversiones de ETH o BTC a USD/ARS/EUR")
     data = json.loads(message)
     if data["type"] == "trade":
         crypto_price = data["data"][0]["p"]
         crypto_currency = "BTC" if data["data"][0]["s"] == "BINANCE:BTCUSDT" else "ETH"
 
         # convertir a pesos argentinos usando la función "conversor"
-        ars_price = libconversor.conversor(float(crypto_price), float(USDARS))
-        eur_price = libconversor.conversor(float(crypto_price), float(USDEUR))
+        ars_price = round(libconversor.conversor(float(crypto_price), float(USDARS)), 2)
+        eur_price = round(libconversor.conversor(float(crypto_price), float(USDEUR)), 2)
         print(f"{crypto_currency}: USD: {crypto_price}, ARS: {ars_price}, EUR: {eur_price}")
+    print("\n\nConversiones terminadas.")
+    print(separador)
+    time.sleep(5)
 
 
 def main():
