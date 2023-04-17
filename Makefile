@@ -1,24 +1,27 @@
-AS		:= nasm
-ASFLAGS := -f elf64 
-CFLAGS	:= -m64
-LDFLAGS := -m64
-CC		:= gcc
-CXX		:= g++
-CXXFLAGS := -m64
-TARGETS := conversor 
-DEP := driver.o asm_io.o
+CC:=gcc
+AS:=nasm
+CFLAGS:=-c -Wall -Werror
+ASFLAGS:=-f elf64
+LIBFLAGS:=-shared -o libconversor.so
 
-.PHONY: clean
+SRCS:=conversor.c multiply.asm
+OBJS:=conversor.o multiply.o
 
-%.o: %.asm
-	$(AS) $(ASFLAGS) $< 
+all: libconversor.so
 
-all: $(TARGETS)
-	
-conversor: multiply.o conversor.c
+libconversor.so: $(OBJS)
+	$(CC) $(LIBFLAGS) $(OBJS)
 
-clean :
-	rm -f *.o $(TARGETS)
-#    nasm -f elf64 -o multiply.o multiply.asm
-#    gcc -c -m64 -Wall -Wextra -pedantic -std=c11 -o main.o main.c
-#    gcc -m64 -o mult main.o multiply.o
+conversor.o: conversor.c
+	$(CC) $(CFLAGS) conversor.c
+
+multiply.o: multiply.asm
+	$(AS) $(ASFLAGS) -o multiply.o multiply.asm
+
+clean:
+	rm -f *.o libconversor.so
+
+
+#  5651* nasm -f elf64 multiply.asm
+#  5652* gcc -c conversor.c
+#  5653* gcc -shared -o libconversor.so conversor.o multiply.o
