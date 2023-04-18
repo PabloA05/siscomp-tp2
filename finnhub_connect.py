@@ -19,7 +19,7 @@ libconversor.conversor.restype = ctypes.c_float
 libconversor.conversor.argtypes = (ctypes.c_float, ctypes.c_float,)
 
 # variables globales default para almacenar las cotizaciones de USDTEUR y USDTARS
-USDEUR = 1.08
+USDEUR = 0.91
 USDARS = 400.0
 
 
